@@ -1,0 +1,40 @@
+name: release_manual
+
+on:
+  push:
+    tags:
+    - "v*"
+
+jobs:
+  release_manual:
+    environment: release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: 'go.mod'
+    - run: make install_tools
+      name: Install tools
+    - name: Import GPG key
+      uses: crazy-max/ghaction-import-gpg@v5
+      id: import_gpg
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+    - name: Extract tag name from git ref
+      id: tag_name
+      run: echo "TAG_NAME=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+    - name: Ensure changelog exists
+      run: ls changes/${{ steps.tag_name.outputs.TAG_NAME }}.md
+    - name: Run goreleaser
+      run: |
+        goreleaser release \
+          --release-notes=changes/${{ steps.tag_name.outputs.tag_name }}.md \
+          --skip-validate \
+          --rm-dist
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
