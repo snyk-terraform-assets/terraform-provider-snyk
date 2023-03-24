@@ -63,7 +63,7 @@ plugin_cache_dir   = "$HOME/.terraform.d/plugin-cache"
 provider_installation {
 
   dev_overrides {
-     "registry.terraform.io/snyk/snyk" = "/Users/muratcelep/git/terraform-provider-snyk"
+     "registry.terraform.io/snyk-terraform-assets/snyk" = "/Users/muratcelep/git/terraform-provider-snyk"
   }
 
   # For all other providers, install them directly from their origin provider

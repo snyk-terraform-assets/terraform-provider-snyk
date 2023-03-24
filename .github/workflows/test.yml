@@ -80,7 +80,7 @@ jobs:
           provider_installation {
           
             dev_overrides {
-            "registry.terraform.io/snyk/snyk" = "$GITHUB_WORKSPACE"
+            "registry.terraform.io/snyk-terraform-assets/snyk" = "$GITHUB_WORKSPACE"
           }
           
             direct {}
