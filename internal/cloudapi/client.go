@@ -16,10 +16,11 @@ package cloudapi
 
 import (
 	"fmt"
-	snyk_http "github.com/snyk-terraform-assets/terraform-provider-snyk/internal/http"
 	"net/http"
 	"net/url"
 	"os"
+
+	snyk_http "github.com/snyk-terraform-assets/terraform-provider-snyk/internal/http"
 )
 
 const VERSION = "2022-04-13~experimental"
@@ -75,11 +76,19 @@ func newClient(config ClientConfig) (*Client, error) {
 	}
 
 	if config.URL == "" {
-		return nil, fmt.Errorf("no URL provided")
+		if env, ok := os.LookupEnv("SNYK_API"); ok {
+			config.URL = env
+		} else {
+			return nil, fmt.Errorf("no URL provided")
+		}
 	}
 
 	if config.Token == "" && config.BearerToken == "" {
-		return nil, fmt.Errorf("no token provided")
+		if env, ok := os.LookupEnv("SNYK_TOKEN"); ok {
+			config.Token = env
+		} else {
+			return nil, fmt.Errorf("no token provided")
+		}
 	}
 
 	if config.Version == "" {
