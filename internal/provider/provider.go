@@ -88,11 +88,13 @@ func (p *SnykProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 func (p *SnykProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewEnvironmentResource,
+		NewPermissionsResource,
 	}
 }
 
 func (p *SnykProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+	}
 }
 
 func New(version string) func() provider.Provider {
