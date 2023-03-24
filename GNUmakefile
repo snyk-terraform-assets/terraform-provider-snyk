@@ -11,7 +11,7 @@ NAMESPACE=snyk
 NAME=snyk
 BINARY=terraform-provider-${NAME}
 VERSION=1
-OS_ARCH=darwin_amd64
+OS_ARCH?=darwin_amd64
 
 build:
 	go build -o ${BINARY}
