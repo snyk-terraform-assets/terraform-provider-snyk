@@ -173,7 +173,9 @@ func (r *EnvironmentResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	kind := plan.Kind.ValueString()
-	if r.isInvalidKindConfiguration(kind, plan, resp.Diagnostics) {
+	kindDiags := r.checkKindConfiguration(kind, plan)
+	resp.Diagnostics.Append(kindDiags...)
+	if kindDiags.HasError() {
 		return
 	}
 
@@ -215,56 +217,56 @@ func (r *EnvironmentResource) prepareEnvironmentRequest(kind string, plan *Envir
 	return request
 }
 
-func (r *EnvironmentResource) isInvalidKindConfiguration(kind string, plan *EnvironmentResourceModel, diags diag.Diagnostics) bool {
+func (r *EnvironmentResource) checkKindConfiguration(kind string, plan *EnvironmentResourceModel) (diags diag.Diagnostics) {
 	if kind == cloudapi.KIND_AWS {
 		if strings.TrimSpace(plan.Aws.RoleArn.ValueString()) == "" {
 			diags.AddError("Configuration Error", "Unable to read AWS role_arn. A valid AWS Role arn should be provided.")
-			return true
+			return
 		}
 
 		if plan.Google != nil || plan.Azure != nil {
 			diags.AddError("Configuration Error", "Invalid configuration, Google and AWS configurations should be empty when using AWS")
-			return true
+			return
 		}
 
 	} else if kind == cloudapi.KIND_GOOGLE {
 		if plan.Aws != nil || plan.Azure != nil {
 			diags.AddError("Configuration Error", "Invalid configuration, Azure and AWS configurations should be empty when using Google")
-			return true
+			return
 		}
 		if strings.TrimSpace(plan.Google.ProjectId.ValueString()) == "" {
 			diags.AddError("Configuration Error", "Unable to read Google project_id. A valid Google project_id should be provided.")
-			return true
+			return
 		}
 		if strings.TrimSpace(plan.Google.ServiceAccountEmail.ValueString()) == "" {
 			diags.AddError("Configuration Error", "Unable to read Google service_account_email. A valid Google service_account_email  should be provided.")
-			return true
+			return
 		}
 
 	} else if kind == cloudapi.KIND_AZURE {
 		if plan.Aws != nil || plan.Google != nil {
 			diags.AddError("Configuration Error", "Invalid configuration, Google and AWS configurations should be empty when using Azure")
-			return true
+			return
 		}
 
 		if strings.TrimSpace(plan.Azure.ApplicationId.ValueString()) == "" {
 			diags.AddError("Configuration Error", "Unable to read Azure application_id. A valid Azure application_id should be provided.")
-			return true
+			return
 		}
 		if strings.TrimSpace(plan.Azure.TenantId.ValueString()) == "" {
 			diags.AddError("Configuration Error", "Unable to read Azure tenant_id. A valid Azure tenant_id  should be provided.")
-			return true
+			return
 		}
 		if strings.TrimSpace(plan.Azure.SubscriptionId.ValueString()) == "" {
 			diags.AddError("Configuration Error", "Unable to read Azure subscription_id. A valid Azure subscription_id  should be provided.")
-			return true
+			return
 		}
 	} else {
 		diags.AddError("Configuration Error", "Unable to parse Environment kind. Kind should be one of [aws,azure,google]")
-		return true
+		return
 	}
 
-	return false
+	return
 }
 
 func (r *EnvironmentResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -322,8 +324,10 @@ func (r *EnvironmentResource) Update(ctx context.Context, req resource.UpdateReq
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
 	kind := plan.Kind.ValueString()
-	if r.isInvalidKindConfiguration(kind, plan, resp.Diagnostics) {
+	resp.Diagnostics.Append(r.checkKindConfiguration(kind, plan)...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	request := r.prepareEnvironmentRequest(kind, plan)
