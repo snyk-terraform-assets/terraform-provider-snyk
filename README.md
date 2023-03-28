@@ -75,9 +75,7 @@ provider_installation {
 
 
 ## Releases
-
-Releasing a new version of the policy engine is highly automated.  A new
-version can be released by running the following command, from the root of
+A new version can be released by running the following command, from the root of
 the repository:
 
 ```bash
