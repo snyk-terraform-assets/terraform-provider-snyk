@@ -5,7 +5,7 @@ variable "SNYK_TOKEN" {
 terraform {
   required_providers {
     snyk = {
-      source = "registry.terraform.io/snyk/snyk"
+      source = "registry.terraform.io/snyk-terraform-assets/snyk"
     }
   }
 }
