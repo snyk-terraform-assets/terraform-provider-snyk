@@ -50,7 +50,7 @@ func main() {
 
 	opts := providerserver.ServeOpts{
 		// TODO: Update this string with the published name of your provider.
-		Address: "registry.terraform.io/snyk/snyk",
+		Address: "registry.terraform.io/snyk-terraform-assets/snyk",
 		Debug:   debug,
 	}
 
