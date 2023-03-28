@@ -32,7 +32,7 @@ provider "snyk" {
 
 
 resource "snyk_environment" "example" {
-  name            = "google 12345"
+  name            = "aws 12345"
   kind            = "aws"
   organization_id = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXXXXX"
   aws {
