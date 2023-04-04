@@ -3,12 +3,12 @@
 page_title: "snyk_environment Resource - terraform-provider-snyk"
 subcategory: ""
 description: |-
-  Example resource
+  Provides Snyk Cloud Environments https://docs.snyk.io/scan-cloud-deployment/snyk-cloud/snyk-cloud-concepts#environments
 ---
 
 # snyk_environment (Resource)
 
-Example resource
+Provides Snyk [Cloud Environments](https://docs.snyk.io/scan-cloud-deployment/snyk-cloud/snyk-cloud-concepts#environments)
 
 ## Example Usage
 

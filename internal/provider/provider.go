@@ -51,7 +51,7 @@ func (p *SnykProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Example provider attribute",
+				MarkdownDescription: "API endpoint",
 				Optional:            true,
 			},
 			"api_token": schema.StringAttribute{

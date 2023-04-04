@@ -30,4 +30,4 @@ provider "snyk" {
 ### Optional
 
 - `api_token` (String) API token
-- `endpoint` (String) Example provider attribute
+- `endpoint` (String) API endpoint
