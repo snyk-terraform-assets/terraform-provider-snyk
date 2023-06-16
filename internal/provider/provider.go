@@ -17,12 +17,13 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/snyk-terraform-assets/terraform-provider-snyk/internal/cloudapi"
+	"github.com/snyk-terraform-assets/terraform-provider-snyk/internal/snykclient"
 )
 
 // Ensure SnykProvider satisfies various provider interfaces.
@@ -73,7 +74,7 @@ func (p *SnykProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 	// Example client configuration for data sources and resources
 
-	client, err := cloudapi.NewClient(data.Endpoint.ValueString(), data.ApiToken.ValueString())
+	client, err := snykclient.NewClient(data.Endpoint.ValueString(), data.ApiToken.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create rest client: %s", err))
@@ -88,6 +89,7 @@ func (p *SnykProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 func (p *SnykProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewEnvironmentResource,
+		NewOrganizationResource,
 	}
 }
 
