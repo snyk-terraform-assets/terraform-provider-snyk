@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cloudapi
+package organization
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ import (
 	snyk_http "github.com/snyk-terraform-assets/terraform-provider-snyk/internal/http"
 )
 
-const VERSION = "2022-04-13~experimental"
+const VERSION = "2023-04-28~beta"
 
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
@@ -54,7 +54,7 @@ func NewClient(url string, token string) (*Client, error) {
 		return nil, err
 	}
 
-	cloudapiClient, err := newClient(ClientConfig{
+	client, err := newClient(ClientConfig{
 		HTTPClient: httpClient,
 		URL:        url,
 		Token:      token,
@@ -64,7 +64,7 @@ func NewClient(url string, token string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	} else {
-		return cloudapiClient, nil
+		return client, nil
 	}
 }
 

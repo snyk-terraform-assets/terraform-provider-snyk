@@ -12,35 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cloudapi
+package organization
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-func (c *Client) UpdateEnvironment(ctx context.Context, orgID string, envID string, request *EnvironmentRequest) (e error) {
-	var body bytes.Buffer
+func (c *Client) DeleteOrganization(ctx context.Context, orgID string) (e error) {
+	url := fmt.Sprintf("%s/v1/org/%s", c.url, orgID)
 
-	if err := json.NewEncoder(&body).Encode(convertEnvRequestOptionsForMarshal(request)); err != nil {
-		return err
-	}
-
-	url := fmt.Sprintf("%s/rest/orgs/%s/cloud/environments/%s", c.url, orgID, envID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, url, &body)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
 		return err
 	}
 
 	query := req.URL.Query()
-	query.Set("version", c.version)
 	req.URL.RawQuery = query.Encode()
 
-	req.Header.Set("Content-Type", "application/vnd.api+json")
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", c.authorization)
 
 	res, err := c.httpClient.Do(req)
@@ -54,7 +45,7 @@ func (c *Client) UpdateEnvironment(ctx context.Context, orgID string, envID stri
 		}
 	}()
 
-	if res.StatusCode != http.StatusOK { // what about http.StatusOK?
+	if res.StatusCode != http.StatusNoContent {
 		return fmt.Errorf("invalid status code: %v", res.StatusCode)
 	}
 
