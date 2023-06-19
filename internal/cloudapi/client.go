@@ -45,9 +45,7 @@ type Client struct {
 }
 
 func NewClient(url string, token string) (*Client, error) {
-
 	httpClient, err := snyk_http.NewClient(
-		snyk_http.WithTLSSkipVerify(true),
 		snyk_http.WithExtraCertificates(os.Getenv("NODE_EXTRA_CA_CERTS")),
 	)
 	if err != nil {
