@@ -32,7 +32,7 @@ type OrganizationResponse struct {
 		Attributes struct {
 			Name       string `json:"name"`
 			Slug       string `json:"slug"`
-			IsPersonal string `json:"is_personal"`
+			IsPersonal bool   `json:"is_personal"`
 			GroupID    string `json:"group_id"`
 		} `json:"attributes"`
 	} `json:"data"`
