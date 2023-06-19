@@ -48,7 +48,6 @@ type OrganizationResourceModel struct {
 	GroupId     types.String `tfsdk:"group_id"`
 	Name        types.String `tfsdk:"name"`
 	SourceOrgId types.String `tfsdk:"source_organization_id"`
-
 }
 
 func (r *OrganizationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -114,10 +113,12 @@ func (r *OrganizationResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	_, err := uuid.Parse(plan.GroupId.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to parse OrganizationDataSource Group Guid, got error: %s", err))
-		return
+	if !plan.GroupId.IsNull() {
+		_, err := uuid.Parse(plan.GroupId.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to parse OrganizationDataSource Group Guid, got error: %s", err))
+			return
+		}
 	}
 
 	res, err := r.client.OrgClient.CreateOrganization(ctx, &organization.OrganizationRequest{Name: plan.Name.ValueString(), GroupId: plan.GroupId.ValueString(), SourceOrgId: plan.SourceOrgId.ValueString()})
