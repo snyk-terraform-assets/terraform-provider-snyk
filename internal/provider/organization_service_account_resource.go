@@ -128,6 +128,7 @@ func (r *OrganizationServiceAccountResource) Configure(ctx context.Context, req 
 }
 
 func (r *OrganizationServiceAccountResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	// 500s on an account already existing
 	var plan *OrganizationServiceAccountResourceModel
 	// Read Terraform plan into the model
 	diags := req.Plan.Get(ctx, &plan)
@@ -197,5 +198,6 @@ func (r *OrganizationServiceAccountResource) Delete(ctx context.Context, req res
 }
 
 func (r *OrganizationServiceAccountResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// This shouldnt work, which is kind of subpar
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
