@@ -47,7 +47,8 @@ type OrganizationResourceModel struct {
 	Id          types.String `tfsdk:"id"`
 	GroupId     types.String `tfsdk:"group_id"`
 	Name        types.String `tfsdk:"name"`
-	SourceOrgId types.String `tfsdk:"source_org_id"`
+	SourceOrgId types.String `tfsdk:"source_organization_id"`
+
 }
 
 func (r *OrganizationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
