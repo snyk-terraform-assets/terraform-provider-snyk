@@ -25,20 +25,11 @@ import (
 )
 
 type config struct {
-	tlsSkipVerify bool
 	certificates  []string
 }
 
 // Option is a configuration option for the HTTP client.
 type Option func(c *config)
-
-// WithTLSSkipVerify enables or disables the verification of the server TLS
-// certificates. This option defaults to false.
-func WithTLSSkipVerify(tlsSkipVerify bool) Option {
-	return func(c *config) {
-		c.tlsSkipVerify = tlsSkipVerify
-	}
-}
 
 // WithExtraCertificates adds more certificates to the pool of certificates
 // trusted by this client. path is the path to a PEM file containing one or more
@@ -74,7 +65,6 @@ func NewClient(options ...Option) (*http.Client, error) {
 	if transport, ok := client.Transport.(*http.Transport); ok {
 		transport.TLSClientConfig = &tls.Config{
 			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: c.tlsSkipVerify,
 			RootCAs:            pool,
 		}
 	}
