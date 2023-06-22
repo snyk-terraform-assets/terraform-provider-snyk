@@ -129,6 +129,12 @@ func (c *Client) DeleteOrganizationServiceAccount(ctx context.Context, orgID, sa
 	}()
 
 	if res.StatusCode != http.StatusNoContent {
+		// if it is not there we do not need to delete this. This can happen because the organization might be deleted
+		// before we try to delete the service account also with no get endpoint for service accounts we cannot actually
+		// check if they still exist before trying to delete.
+		if res.StatusCode == http.StatusNotFound {
+			return nil
+		}
 		return fmt.Errorf("invalid status code: %v", res.StatusCode)
 	}
 
