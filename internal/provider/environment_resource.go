@@ -17,6 +17,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -26,7 +28,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/snyk-terraform-assets/terraform-provider-snyk/internal/cloudapi"
-	"strings"
+	"github.com/snyk-terraform-assets/terraform-provider-snyk/internal/snykclient"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -39,7 +41,7 @@ func NewEnvironmentResource() resource.Resource {
 
 // EnvironmentResource defines the resource implementation.
 type EnvironmentResource struct {
-	client cloudapi.Client
+	client snykclient.Client
 }
 
 // EnvironmentResourceModel describes the resource data model.
@@ -142,12 +144,12 @@ func (r *EnvironmentResource) Configure(ctx context.Context, req resource.Config
 		return
 	}
 
-	client, ok := req.ProviderData.(*cloudapi.Client)
+	client, ok := req.ProviderData.(*snykclient.Client)
 
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *cloudapi.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *snykclient.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -181,7 +183,7 @@ func (r *EnvironmentResource) Create(ctx context.Context, req resource.CreateReq
 
 	request := r.prepareEnvironmentRequest(kind, plan)
 
-	res, err := r.client.CreateEnvironment(ctx, plan.OrganizationId.ValueString(), request)
+	res, err := r.client.CloudapiClient.CreateEnvironment(ctx, plan.OrganizationId.ValueString(), request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create Environment, got error: %s", err))
 		return
@@ -278,7 +280,7 @@ func (r *EnvironmentResource) Read(ctx context.Context, req resource.ReadRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	res, err := r.client.GetEnvironment(ctx, data.OrganizationId.ValueString(), data.Id.ValueString())
+	res, err := r.client.CloudapiClient.GetEnvironment(ctx, data.OrganizationId.ValueString(), data.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to get Environment, got error: %s", err))
 		return
@@ -332,7 +334,7 @@ func (r *EnvironmentResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 	request := r.prepareEnvironmentRequest(kind, plan)
 
-	err := r.client.UpdateEnvironment(ctx, plan.OrganizationId.ValueString(), plan.Id.ValueString(), request)
+	err := r.client.CloudapiClient.UpdateEnvironment(ctx, plan.OrganizationId.ValueString(), plan.Id.ValueString(), request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update Environment, got error: %s", err))
 		return
@@ -352,7 +354,7 @@ func (r *EnvironmentResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	err := r.client.DeleteEnvironment(ctx, data.OrganizationId.ValueString(), data.Id.ValueString())
+	err := r.client.CloudapiClient.DeleteEnvironment(ctx, data.OrganizationId.ValueString(), data.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Could not delete Environment, got error: %s", err))
 		return

@@ -91,6 +91,7 @@ jobs:
       - run: |
           TF_VAR_SNYK_TOKEN=${{secrets.TF_VAR_SNYK_TOKEN}} \
           TEST_SNYK_ORG_ID=${{secrets.TEST_SNYK_ORG_ID}} \
+          TEST_SNYK_GROUP_ID=${{secrets.TEST_SNYK_GROUP_ID}} \
           TEST_AWS_ARN=${{secrets.TEST_AWS_ARN}} \
           TEST_AZURE_APPLICATION_ID=${{secrets.TEST_AZURE_APPLICATION_ID}} \
           TEST_AZURE_SUBSCRIPTION_ID=${{secrets.TEST_AZURE_SUBSCRIPTION_ID}} \
