@@ -88,15 +88,11 @@ jobs:
           EOF
       - run: cat ~/.terraformrc
       - run: make build
-      - run: |
-          TF_VAR_SNYK_TOKEN=${{secrets.TF_VAR_SNYK_TOKEN}} \
-          TEST_SNYK_ORG_ID=${{secrets.TEST_SNYK_ORG_ID}} \
-          TEST_SNYK_GROUP_ID=${{secrets.TEST_SNYK_GROUP_ID}} \
-          TEST_AWS_ARN=${{secrets.TEST_AWS_ARN}} \
-          TEST_AZURE_APPLICATION_ID=${{secrets.TEST_AZURE_APPLICATION_ID}} \
-          TEST_AZURE_SUBSCRIPTION_ID=${{secrets.TEST_AZURE_SUBSCRIPTION_ID}} \
-          TEST_AZURE_TENANT_ID=${{secrets.TEST_AZURE_TENANT_ID}} \
-          TEST_GOOGLE_PROJECT_ID=${{secrets.TEST_GOOGLE_PROJECT_ID}} \
-          TEST_GOOGLE_SERVICE_ACCOUNT_EMAIL=${{secrets.TEST_GOOGLE_SERVICE_ACCOUNT_EMAIL}} \
-          make testacc
+      - run: make testacc
         timeout-minutes: 15
+        env:
+          TEST_SNYK_API: ${{ secrets.TEST_SNYK_API }}
+          TEST_SNYK_TOKEN: ${{ secrets.TEST_SNYK_TOKEN }}
+          TEST_SNYK_ORG_ID: ${{ secrets.TEST_SNYK_ORG_ID }}
+          TEST_SNYK_GROUP_ID: ${{ secrets.TEST_SNYK_GROUP_ID }}
+          TEST_AWS_ARN: ${{ secrets.TEST_AWS_ARN }}
