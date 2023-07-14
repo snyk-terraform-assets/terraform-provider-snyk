@@ -27,5 +27,3 @@ Provides Snyk [Organizations](https://docs.snyk.io/snyk-admin/manage-groups-and-
 ### Read-Only
 
 - `id` (String) Snyk organization id
-
-

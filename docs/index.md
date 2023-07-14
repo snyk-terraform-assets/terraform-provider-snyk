@@ -13,13 +13,14 @@ description: |-
 ## Example Usage
 
 ```terraform
-variable "SNYK_TOKEN" {
-  default = ""
+variable "snyk_token" {
+  type      = string
+  sensitive = true
 }
 
 provider "snyk" {
   # example configuration here
-  api_token = var.SNYK_TOKEN
+  api_token = var.snyk_token
   endpoint  = "https://api.snyk.io/rest"
 }
 ```
@@ -29,5 +30,5 @@ provider "snyk" {
 
 ### Optional
 
-- `api_token` (String) API token
+- `api_token` (String, Sensitive) API token
 - `endpoint` (String) API endpoint
