@@ -58,6 +58,7 @@ func (p *SnykProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 			"api_token": schema.StringAttribute{
 				MarkdownDescription: "API token ",
 				Optional:            true,
+				Sensitive:           true,
 			},
 		},
 	}

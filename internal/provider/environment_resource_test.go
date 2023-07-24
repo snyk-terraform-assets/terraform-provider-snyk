@@ -16,58 +16,53 @@ package provider
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccExampleResource(t *testing.T) {
-	snykOrgId := readEnvironmentVar("TEST_SNYK_ORG_ID")
-	awsArn := readEnvironmentVar("TEST_AWS_ARN")
-	azureApplicationId := readEnvironmentVar("TEST_AZURE_APPLICATION_ID")
-	azureSubscriptionId := readEnvironmentVar("TEST_AZURE_SUBSCRIPTION_ID")
-	azureTenantId := readEnvironmentVar("TEST_AZURE_TENANT_ID")
-
-	googleProjectId := readEnvironmentVar("TEST_GOOGLE_PROJECT_ID")
-	googleServiceAccountEmail := readEnvironmentVar("TEST_GOOGLE_SERVICE_ACCOUNT_EMAIL")
+func TestAccAwsEnvironment(t *testing.T) {
+	snykOrgId := readEnvVarOrFail(t, "TEST_SNYK_ORG_ID")
+	awsArn := readEnvVarOrSkip(t, "TEST_AWS_ARN")
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfigForAws("initial", snykOrgId, awsArn),
+				Config: testAccProviderConfig(t) + "\n" +
+					testAccExampleResourceConfigForAws("initial", snykOrgId, awsArn),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test", "name", "initial"),
 					resource.TestCheckResourceAttr("snyk_environment.test", "kind", "aws"),
 					resource.TestCheckResourceAttr("snyk_environment.test", "organization_id", snykOrgId),
 				),
 			},
-			//TODO See the issue here: https://github.com/hashicorp/terraform-plugin-framework/issues/677
-			//// ImportState testing
-			//{
-			//	ResourceName:      "snyk_environment.test",
-			//	ImportState:       true,
-			//	ImportStateVerify: true,
-			//	// This is not normally necessary, but is here because this
-			//	// example code does not have an actual upstream service.
-			//	// Once the Read method is able to refresh information from
-			//	// the upstream service, this can be removed.
-			//	ImportStateVerifyIgnore: []string{"configurable_attribute"},
-			//},
 			// Update and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfigForAws("updated", snykOrgId, awsArn),
+				Config: testAccProviderConfig(t) + "\n" +
+					testAccExampleResourceConfigForAws("updated", snykOrgId, awsArn),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test", "name", "updated"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
+func TestAccAzureEnvironment(t *testing.T) {
+	snykOrgId := readEnvVarOrFail(t, "TEST_SNYK_ORG_ID")
+	azureApplicationId := readEnvVarOrSkip(t, "TEST_AZURE_APPLICATION_ID")
+	azureSubscriptionId := readEnvVarOrSkip(t, "TEST_AZURE_SUBSCRIPTION_ID")
+	azureTenantId := readEnvVarOrSkip(t, "TEST_AZURE_TENANT_ID")
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfigForAzure("initial", snykOrgId, azureApplicationId, azureSubscriptionId, azureTenantId),
+				Config: testAccProviderConfig(t) + "\n" +
+					testAccExampleResourceConfigForAzure("initial", snykOrgId, azureApplicationId, azureSubscriptionId, azureTenantId),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test_azure", "name", "initial"),
 					resource.TestCheckResourceAttr("snyk_environment.test_azure", "kind", "azure"),
@@ -79,7 +74,8 @@ func TestAccExampleResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfigForAzure("updated", snykOrgId, azureApplicationId, azureSubscriptionId, azureTenantId),
+				Config: testAccProviderConfig(t) + "\n" +
+					testAccExampleResourceConfigForAzure("updated", snykOrgId, azureApplicationId, azureSubscriptionId, azureTenantId),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test_azure", "name", "updated"),
 					resource.TestCheckResourceAttr("snyk_environment.test_azure", "azure.application_id", azureApplicationId),
@@ -88,9 +84,22 @@ func TestAccExampleResource(t *testing.T) {
 				),
 			},
 			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
+func TestAccGoogleEnvironment(t *testing.T) {
+	snykOrgId := readEnvVarOrFail(t, "TEST_SNYK_ORG_ID")
+	googleProjectId := readEnvVarOrSkip(t, "TEST_GOOGLE_PROJECT_ID")
+	googleServiceAccountEmail := readEnvVarOrSkip(t, "TEST_GOOGLE_SERVICE_ACCOUNT_EMAIL")
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfigForGoogle("initial", snykOrgId, googleProjectId, googleServiceAccountEmail),
+				Config: testAccProviderConfig(t) + "\n" +
+					testAccExampleResourceConfigForGoogle("initial", snykOrgId, googleProjectId, googleServiceAccountEmail),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "name", "initial"),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "kind", "google"),
@@ -100,13 +109,15 @@ func TestAccExampleResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfigForGoogle("updated", snykOrgId, googleProjectId, googleServiceAccountEmail),
+				Config: testAccProviderConfig(t) + "\n" +
+					testAccExampleResourceConfigForGoogle("updated", snykOrgId, googleProjectId, googleServiceAccountEmail),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "name", "updated"),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.project_id", googleProjectId),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.service_account_email", googleServiceAccountEmail),
 				),
 			},
+			// Delete testing automatically occurs in TestCase
 		},
 	})
 }
@@ -150,13 +161,4 @@ resource "snyk_environment" "test_google" {
     service_account_email = %[4]q
   }
 }`, envName, orgId, projectId, serviceAccountEmail)
-}
-
-func readEnvironmentVar(key string) string {
-	res := os.Getenv(key)
-	if res == "" {
-		panic(fmt.Sprintf("Env variable %s not set!", key))
-	}
-	return res
-
 }

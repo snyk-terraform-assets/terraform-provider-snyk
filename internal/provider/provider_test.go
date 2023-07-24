@@ -15,35 +15,12 @@
 package provider
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-)
-
-const (
-	// providerConfig is a shared configuration to combine with the actual
-	// test configuration so the HashiCups client is properly configured.
-	// It is also possible to use the HASHICUPS_ environment variables instead,
-	// such as updating the Makefile and running the testing through that tool.
-	providerConfig = `
-variable "SNYK_TOKEN" {
-  default = ""
-}
-terraform {
-  required_providers {
-    snyk = {
-      source = "registry.terraform.io/snyk-terraform-assets/snyk"
-    }
-  }
-}
-
-provider "snyk" {
-  api_token = "${var.SNYK_TOKEN}"
-  endpoint = "https://api.snyk.io/rest"
-}
-`
 )
 
 // testAccProtoV6ProviderFactories are used to instantiate a provider during
@@ -54,12 +31,44 @@ var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServe
 	"scaffolding": providerserver.NewProtocol6WithError(New("test")()),
 }
 
-func testAccPreCheck(t *testing.T) {
-	// You can add code here to run prior to any test case execution, for example assertions
-	// about the appropriate environment variables being set are common to see in a pre-check
-	// function.
-	snyk_token := os.Getenv("TF_VAR_SNYK_TOKEN")
-	if snyk_token == "" {
-		panic("Env variable TF_VAR_SNYK_TOKEN not set!")
+func testAccProviderConfig(t *testing.T) string {
+	apiToken := readEnvVarOrFail(t, "TEST_SNYK_TOKEN")
+	endpoint := os.Getenv("TEST_SNYK_API")
+	if endpoint == "" {
+		endpoint = "https://api.snyk.io/rest"
 	}
+
+	return fmt.Sprintf(`
+terraform {
+  required_providers {
+    snyk = {
+      source = "registry.terraform.io/snyk-terraform-assets/snyk"
+    }
+  }
+}
+
+provider "snyk" {
+  api_token = %[1]q
+  endpoint  = %[2]q
+}`, apiToken, endpoint)
+}
+
+// readEnvVarOrFail reads the requested environment variable.
+// If this variable is not present, the test fails.
+func readEnvVarOrFail(t *testing.T, key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		t.Fatalf("Missing environment variable %s", key)
+	}
+	return val
+}
+
+// readEnvVarOrSkip reads the requested environment variable.
+// If this variable is not present, the test is skipped.
+func readEnvVarOrSkip(t *testing.T, key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		t.Skipf("Missing environment variable %s", key)
+	}
+	return val
 }

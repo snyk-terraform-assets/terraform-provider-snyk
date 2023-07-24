@@ -8,15 +8,16 @@ import (
 )
 
 func TestAccExampleOrganizationResource(t *testing.T) {
-	snykGroupId := readEnvironmentVar("TEST_SNYK_GROUP_ID")
+	// TODO: don't skip this
+	snykGroupId := readEnvVarOrSkip(t, "TEST_SNYK_GROUP_ID")
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + testAccExampleOrganizationResourceRaw("Test snyk org", snykGroupId), // TODO: group id
+				Config: testAccProviderConfig(t) + "\n" +
+					testAccExampleOrganizationResourceRaw("Test snyk org", snykGroupId),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_organization.test", "name", "Test snyk org"),
 					resource.TestCheckResourceAttr("snyk_organization.test", "group_id", snykGroupId),

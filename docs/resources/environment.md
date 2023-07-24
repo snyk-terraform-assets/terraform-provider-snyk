@@ -13,8 +13,9 @@ Provides Snyk [Cloud Environments](https://docs.snyk.io/scan-cloud-deployment/sn
 ## Example Usage
 
 ```terraform
-variable "SNYK_TOKEN" {
-  default = ""
+variable "snyk_token" {
+  type      = string
+  sensitive = true
 }
 
 terraform {
@@ -24,12 +25,11 @@ terraform {
     }
   }
 }
+
 provider "snyk" {
-  # example configuration here
-  api_token = var.SNYK_TOKEN
+  api_token = var.snyk_token
   endpoint  = "https://api.snyk.io/rest"
 }
-
 
 resource "snyk_environment" "example" {
   name            = "aws 12345"
@@ -95,5 +95,3 @@ Optional:
 
 - `project_id` (String) Google project ID
 - `service_account_email` (String) Google service account email
-
-
