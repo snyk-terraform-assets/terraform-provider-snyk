@@ -19,11 +19,14 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/snyk-terraform-assets/terraform-provider-snyk/internal/organization"
 	"github.com/snyk-terraform-assets/terraform-provider-snyk/internal/snykclient"
@@ -82,10 +85,17 @@ func (r *OrganizationServiceAccountResource) Schema(ctx context.Context, req res
 			"access_token_ttl_seconds": schema.Int64Attribute{
 				MarkdownDescription: "The time, in seconds, that a generated access token will be valid for. Defaults to 1 hour if unset. Only used when auth_type is oauth_private_key_jwt. Constraints: Min 3600|Max 86400",
 				Optional:            true,
+				Validators: []validator.Int64{
+					int64validator.AtLeast(3600),
+					int64validator.AtMost(86400),
+				},
 			},
 			"auth_type": schema.StringAttribute{
-				MarkdownDescription: "Authentication strategy fro the service account: api_key - Regulare Snyk API Key. oauth_private_key_jwt - OAuth2 client_credentials grant, using private_key_jwt client_assertion as laid out in OIDC Connect Core 1.0, section 9. Allowed: api_key|oauth_private_key_jwt",
+				MarkdownDescription: "Authentication strategy for the service account: api_key - Regular Snyk API Key. oauth_private_key_jwt - OAuth2 client_credentials grant, using private_key_jwt client_assertion as laid out in OIDC Connect Core 1.0, section 9. Allowed: api_key|oauth_private_key_jwt",
 				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf("api_key", "oauth_private_key_jwt"),
+				},
 			},
 			"jwks_url": schema.StringAttribute{
 				MarkdownDescription: "A JWKs URL hosting your public keys, used to verify signed JWT requests. Must be https. Required only when auth_type is oauth_private_key_jwt",
@@ -96,7 +106,7 @@ func (r *OrganizationServiceAccountResource) Schema(ctx context.Context, req res
 				Required:            true,
 			},
 			"role_id": schema.StringAttribute{
-				MarkdownDescription: "The ID of the role which the created service account should us. Obtained in the Snyk UI, via \"Group Page\" -> \"Settings\" -> \"Member Roles\" -> \"Create new Role\". Can be shared among multiple accounts.",
+				MarkdownDescription: "The ID of the role which the created service account should use. Obtained in the Snyk UI, via \"Group Page\" -> \"Settings\" -> \"Member Roles\" -> \"Create new Role\". Can be shared among multiple accounts.",
 				Required:            true,
 			},
 			"organization_id": schema.StringAttribute{
