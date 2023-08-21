@@ -115,7 +115,7 @@ func (c *Client) DeleteOrganizationServiceAccount(ctx context.Context, orgID, sa
 	req.URL.RawQuery = query.Encode()
 
 	req.Header.Set("Content-Type", "application/vnd.api+json")
-	req.Header.Set("Authorization", SERVICEACCOUNTVERSION)
+	req.Header.Set("Authorization", c.authorization)
 
 	res, err := c.httpClient.Do(req)
 	if err != nil {
