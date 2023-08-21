@@ -38,3 +38,4 @@ website/vendor
 *lock.hcl
 
 terraform-provider-snyk
+.devcontainer
