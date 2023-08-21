@@ -26,6 +26,8 @@ import (
 	"github.com/snyk-terraform-assets/terraform-provider-snyk/internal/snykclient"
 )
 
+const DefaultEndpoint = "https://api.snyk.io/rest"
+
 // Ensure SnykProvider satisfies various provider interfaces.
 var _ provider.Provider = &SnykProvider{}
 
@@ -73,9 +75,12 @@ func (p *SnykProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
-	// Example client configuration for data sources and resources
+	endpoint := DefaultEndpoint
+	if !data.Endpoint.IsNull() {
+		endpoint = data.Endpoint.ValueString()
+	}
 
-	client, err := snykclient.NewClient(data.Endpoint.ValueString(), data.ApiToken.ValueString())
+	client, err := snykclient.NewClient(endpoint, data.ApiToken.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create rest client: %s", err))

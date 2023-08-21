@@ -35,7 +35,7 @@ func testAccProviderConfig(t *testing.T) string {
 	apiToken := readEnvVarOrFail(t, "TEST_SNYK_TOKEN")
 	endpoint := os.Getenv("TEST_SNYK_API")
 	if endpoint == "" {
-		endpoint = "https://api.snyk.io/rest"
+		endpoint = DefaultEndpoint
 	}
 
 	return fmt.Sprintf(`
