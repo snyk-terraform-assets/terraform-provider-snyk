@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-const SERVICEACCOUNTVERSION = "2022-09-15~experimental"
+const serviceAccountVersion = "2022-07-08~experimental"
 
 type ServiceAccountRequest struct {
 	AccessTokenTTLSeconds int    `json:"access_token_ttl_seconds,omitempty"`
@@ -60,7 +60,7 @@ func (c *Client) CreateOrganizationServiceAccount(ctx context.Context, orgID str
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/rest/orgs/%s/service_accounts", c.url, orgID)
+	url := fmt.Sprintf("%s/v3/orgs/%s/service_accounts", c.url, orgID)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, &body)
 	if err != nil {
@@ -68,7 +68,7 @@ func (c *Client) CreateOrganizationServiceAccount(ctx context.Context, orgID str
 	}
 
 	query := req.URL.Query()
-	query.Set("version", SERVICEACCOUNTVERSION)
+	query.Set("version", serviceAccountVersion)
 	req.URL.RawQuery = query.Encode()
 
 	req.Header.Set("Content-Type", "application/vnd.api+json")
@@ -104,7 +104,7 @@ func (c *Client) CreateOrganizationServiceAccount(ctx context.Context, orgID str
 }
 
 func (c *Client) DeleteOrganizationServiceAccount(ctx context.Context, orgID, saID string) (e error) {
-	url := fmt.Sprintf("%s/v1/orgs/%s/service_accounts/%s", c.url, orgID, saID)
+	url := fmt.Sprintf("%s/v3/orgs/%s/service_accounts/%s", c.url, orgID, saID)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
 	if err != nil {
@@ -112,6 +112,7 @@ func (c *Client) DeleteOrganizationServiceAccount(ctx context.Context, orgID, sa
 	}
 
 	query := req.URL.Query()
+	query.Set("version", serviceAccountVersion)
 	req.URL.RawQuery = query.Encode()
 
 	req.Header.Set("Content-Type", "application/vnd.api+json")
