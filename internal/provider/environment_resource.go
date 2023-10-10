@@ -64,6 +64,7 @@ type EnvironmentAzureConfigResourceModel struct {
 type EnvironmentGoogleConfigResourceModel struct {
 	ProjectId           types.String `tfsdk:"project_id"`
 	ServiceAccountEmail types.String `tfsdk:"service_account_email"`
+	IdentityProvider    types.String `tfsdk:"identity_provider"`
 }
 
 type EnvironmentAWSConfigResourceModel struct {
@@ -123,6 +124,9 @@ func (r *EnvironmentResource) Schema(ctx context.Context, req resource.SchemaReq
 					}, "service_account_email": schema.StringAttribute{
 						Optional:    true,
 						Description: "Google service account email",
+					}, "identity_provider": schema.StringAttribute{
+						Optional:    true,
+						Description: "Google identity provider URL",
 					},
 				},
 			},
@@ -210,6 +214,7 @@ func (r *EnvironmentResource) prepareEnvironmentRequest(kind string, plan *Envir
 		request.Data.Attributes.GoogleOptions = &cloudapi.GoogleOptions{}
 		request.Data.Attributes.GoogleOptions.ServiceAccountEmail = plan.Google.ServiceAccountEmail.ValueString()
 		request.Data.Attributes.GoogleOptions.ProjectId = plan.Google.ProjectId.ValueString()
+		request.Data.Attributes.GoogleOptions.IdentityProvider = plan.Google.IdentityProvider.ValueString()
 	} else if kind == cloudapi.KIND_AZURE {
 		request.Data.Attributes.AzureOptions = &cloudapi.AzureOptions{}
 		request.Data.Attributes.AzureOptions.ApplicationId = plan.Azure.ApplicationId.ValueString()
@@ -241,7 +246,11 @@ func (r *EnvironmentResource) checkKindConfiguration(kind string, plan *Environm
 			return
 		}
 		if strings.TrimSpace(plan.Google.ServiceAccountEmail.ValueString()) == "" {
-			diags.AddError("Configuration Error", "Unable to read Google service_account_email. A valid Google service_account_email  should be provided.")
+			diags.AddError("Configuration Error", "Unable to read Google service_account_email. A valid Google service_account_email should be provided.")
+			return
+		}
+		if strings.TrimSpace(plan.Google.IdentityProvider.ValueString()) == "" {
+			diags.AddError("Configuration Error", "Unable to read Google identity_provider. A valid Google identity_provider should be provided.")
 			return
 		}
 
@@ -305,6 +314,7 @@ func (r *EnvironmentResource) convertRemoteData2Local(data *EnvironmentResourceM
 		data.Google = &EnvironmentGoogleConfigResourceModel{}
 		data.Google.ServiceAccountEmail = types.StringValue(res.Attributes.GoogleOptions.ServiceAccountEmail)
 		data.Google.ProjectId = types.StringValue(res.Attributes.GoogleOptions.ProjectId)
+		data.Google.IdentityProvider = types.StringValue(res.Attributes.GoogleOptions.IdentityProvider)
 	} else if res.Attributes.Kind == cloudapi.KIND_AZURE {
 		data.Azure = &EnvironmentAzureConfigResourceModel{}
 		data.Azure.TenantId = types.StringValue(res.Attributes.AzureOptions.TenantId)

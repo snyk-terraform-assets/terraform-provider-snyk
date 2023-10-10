@@ -92,6 +92,7 @@ func TestAccGoogleEnvironment(t *testing.T) {
 	snykOrgId := readEnvVarOrFail(t, "TEST_SNYK_ORG_ID")
 	googleProjectId := readEnvVarOrSkip(t, "TEST_GOOGLE_PROJECT_ID")
 	googleServiceAccountEmail := readEnvVarOrSkip(t, "TEST_GOOGLE_SERVICE_ACCOUNT_EMAIL")
+	googleIdentityProvider := readEnvVarOrSkip(t, "TEST_GOOGLE_IDENTITY_PROVIDER")
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -99,22 +100,24 @@ func TestAccGoogleEnvironment(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: testAccProviderConfig(t) + "\n" +
-					testAccExampleResourceConfigForGoogle("initial", snykOrgId, googleProjectId, googleServiceAccountEmail),
+					testAccExampleResourceConfigForGoogle("initial", snykOrgId, googleProjectId, googleServiceAccountEmail, googleIdentityProvider),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "name", "initial"),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "kind", "google"),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.project_id", googleProjectId),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.service_account_email", googleServiceAccountEmail),
+					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.identity_provider", googleIdentityProvider),
 				),
 			},
 			// Update and Read testing
 			{
 				Config: testAccProviderConfig(t) + "\n" +
-					testAccExampleResourceConfigForGoogle("updated", snykOrgId, googleProjectId, googleServiceAccountEmail),
+					testAccExampleResourceConfigForGoogle("updated", snykOrgId, googleProjectId, googleServiceAccountEmail, googleIdentityProvider),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "name", "updated"),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.project_id", googleProjectId),
 					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.service_account_email", googleServiceAccountEmail),
+					resource.TestCheckResourceAttr("snyk_environment.test_google", "google.identity_provider", googleIdentityProvider),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -150,7 +153,7 @@ resource "snyk_environment" "test_azure" {
 }
 
 func testAccExampleResourceConfigForGoogle(envName string, orgId string,
-	projectId string, serviceAccountEmail string) string {
+	projectId string, serviceAccountEmail string, identityProvider string) string {
 	return fmt.Sprintf(`
 resource "snyk_environment" "test_google" {
   name = %[1]q
@@ -159,6 +162,7 @@ resource "snyk_environment" "test_google" {
   google {
     project_id = %[3]q
     service_account_email = %[4]q
+    identity_provider = %[5]q
   }
-}`, envName, orgId, projectId, serviceAccountEmail)
+}`, envName, orgId, projectId, serviceAccountEmail, identityProvider)
 }

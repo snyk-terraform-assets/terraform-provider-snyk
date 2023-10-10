@@ -60,6 +60,7 @@ type AzureOptions struct {
 type GoogleOptions struct {
 	ProjectId           string `json:"project_id,omitempty"`
 	ServiceAccountEmail string `json:"service_account_email,omitempty"`
+	IdentityProvider    string `json:"identity_provider"`
 }
 
 func convertEnvRequestOptionsForMarshal(req *EnvironmentRequest) *EnvironmentRequest {

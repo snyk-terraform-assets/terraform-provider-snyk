@@ -31,6 +31,7 @@ resource "snyk_environment" "example" {
   #  google {
   #    project_id = "XXX"
   #    service_account_email = "XXX@XXX.iam.gserviceaccount.com"
+  #    identity_provider = "https://iam.googleapis.com/projects/XXX/locations/global/workloadIdentityPools/XXX/providers/XXX"
   #  }
 
 }
