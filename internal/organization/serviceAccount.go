@@ -9,7 +9,14 @@ import (
 	"net/http"
 )
 
-const serviceAccountVersion = "2022-07-08~experimental"
+type ServiceAccountRequestData struct {
+	Data ServiceAccountRequestWrapper `json:"data"`
+}
+
+type ServiceAccountRequestWrapper struct {
+	Attributes ServiceAccountRequest `json:"attributes"`
+	Type       string                `json:"type"`
+}
 
 type ServiceAccountRequest struct {
 	AccessTokenTTLSeconds int    `json:"access_token_ttl_seconds,omitempty"`
@@ -56,7 +63,13 @@ type ServiceAccountResponse struct {
 
 func (c *Client) CreateOrganizationServiceAccount(ctx context.Context, orgID string, request *ServiceAccountRequest) (sar *ServiceAccountResponse, e error) {
 	var body bytes.Buffer
-	if err := json.NewEncoder(&body).Encode(request); err != nil {
+	data := ServiceAccountRequestData{
+		Data: ServiceAccountRequestWrapper{
+			Attributes: *request,
+			Type:       "service_account",
+		},
+	}
+	if err := json.NewEncoder(&body).Encode(data); err != nil {
 		return nil, err
 	}
 
@@ -68,7 +81,7 @@ func (c *Client) CreateOrganizationServiceAccount(ctx context.Context, orgID str
 	}
 
 	query := req.URL.Query()
-	query.Set("version", serviceAccountVersion)
+	query.Set("version", c.version)
 	req.URL.RawQuery = query.Encode()
 
 	req.Header.Set("Content-Type", "application/vnd.api+json")
@@ -112,7 +125,7 @@ func (c *Client) DeleteOrganizationServiceAccount(ctx context.Context, orgID, sa
 	}
 
 	query := req.URL.Query()
-	query.Set("version", serviceAccountVersion)
+	query.Set("version", c.version)
 	req.URL.RawQuery = query.Encode()
 
 	req.Header.Set("Content-Type", "application/vnd.api+json")
