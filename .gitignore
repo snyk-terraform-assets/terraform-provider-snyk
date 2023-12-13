@@ -39,3 +39,6 @@ website/vendor
 
 terraform-provider-snyk
 .devcontainer
+
+# config for local testing
+local-config.mk

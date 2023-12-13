@@ -1,3 +1,6 @@
+-include local-config.mk
+
+ # Run acceptance tests
 default: testacc
 
 # Run acceptance tests
