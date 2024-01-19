@@ -1,0 +1,3 @@
+kind: Security
+body: Update gRPC and HTTP2 dependencies.
+time: 2024-01-19T08:18:56.278762-05:00
